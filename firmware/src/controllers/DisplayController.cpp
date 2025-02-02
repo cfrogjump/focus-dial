@@ -1,4 +1,5 @@
 #include "controllers/DisplayController.h"
+#include "Config.h"
 
 #include "fonts/Picopixel.h"
 #include "fonts/Org_01.h"
@@ -13,6 +14,9 @@ void DisplayController::begin() {
         for (;;);  // Loop forever if initialization fails
     }
 
+    // Set display rotation from Config.h
+    oled.setRotation(OLED_ROTATION);
+    
     // oled.ssd1306_command(SSD1306_SETCONTRAST);
     // oled.ssd1306_command(128);
     

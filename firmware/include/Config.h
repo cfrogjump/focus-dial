@@ -6,6 +6,7 @@
 #define OLED_WIDTH 128
 #define OLED_HEIGHT 64
 #define OLED_ADDR 0x3C
+#define OLED_ROTATION 2  // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
 
 #define LED_PIN 15
 #define NUM_LEDS 16
