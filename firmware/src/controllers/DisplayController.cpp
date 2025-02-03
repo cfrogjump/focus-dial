@@ -9,20 +9,17 @@ DisplayController::DisplayController(uint8_t oledWidth, uint8_t oledHeight, uint
     : oled(oledWidth, oledHeight, &Wire, -1), animation(&oled) {}
 
 void DisplayController::begin() {
-    if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("Initializing display...");
+    if (!oled.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
         Serial.println(F("SSD1306 allocation failed"));
         for (;;);  // Loop forever if initialization fails
     }
-
-    // Set display rotation from Config.h
+    Serial.println("Display initialized successfully");
+    Serial.printf("Setting rotation to %d\n", OLED_ROTATION);
     oled.setRotation(OLED_ROTATION);
-    
-    // oled.ssd1306_command(SSD1306_SETCONTRAST);
-    // oled.ssd1306_command(128);
-    
     oled.clearDisplay();
     oled.display();
-    Serial.println("DisplayController initialized.");
+    Serial.println("Display setup complete");
 }
 
 void DisplayController::drawSplashScreen() {

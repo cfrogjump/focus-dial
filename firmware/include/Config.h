@@ -6,15 +6,28 @@
 #define OLED_WIDTH 128
 #define OLED_HEIGHT 64
 #define OLED_ADDR 0x3C
-#define OLED_ROTATION 2  // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
+
+// --- Device Configuration ---
+#define DEVICE_ORIENTATION 0  // 0 = Default, 1 = Rotated 180°
+
+// Configure settings based on orientation
+#if DEVICE_ORIENTATION == 1
+    #define OLED_ROTATION 2  // 180° rotation
+    #define ENCODER_A_PIN 25  // Swapped encoder pins
+    #define ENCODER_B_PIN 27
+    #define ENCODER_REVERSE_VALUE true  // Reverse encoder for timer adjustment
+#else
+    #define OLED_ROTATION 0  // Normal orientation
+    #define ENCODER_A_PIN 27  // Normal encoder pins
+    #define ENCODER_B_PIN 25
+    #define ENCODER_REVERSE_VALUE false  // Normal encoder direction
+#endif
 
 #define LED_PIN 15
 #define NUM_LEDS 16
 #define LED_BRIGHTNESS 100
 
-#define ENCODER_A_PIN 27
-#define ENCODER_B_PIN 25
-#define BUTTON_PIN 26
+#define BUTTON_PIN 26  // A0 on QT Py ESP32
 
 // --- LED Colors ---
 #define BLUE        0x0000FF

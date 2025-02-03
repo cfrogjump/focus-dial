@@ -22,8 +22,13 @@ void AdjustState::enter()
         Serial.println("Adjust State: Encoder turned");
         Serial.println(delta);
         
-        // Update duration with delta and enforce bounds
-        this->adjustDuration += (delta * 5);
+        // Update duration based on orientation configuration
+#if ENCODER_REVERSE_VALUE
+        this->adjustDuration -= (delta * 5);  // Reversed
+#else
+        this->adjustDuration += (delta * 5);  // Normal
+#endif
+        
         if (this->adjustDuration < MIN_TIMER) {
             this->adjustDuration = MIN_TIMER;
         } else if (this->adjustDuration > MAX_TIMER) {
