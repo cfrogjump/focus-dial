@@ -1,11 +1,12 @@
 #include "StateMachine.h"
 #include "Controllers.h"
 
-TimerState::TimerState() : duration(0), elapsedTime(0), startTime(0) {}
+TimerState::TimerState() : duration(0), elapsedTime(0), startTime(0), doublePressReceived(false) {}
 
 void TimerState::enter()
 {
     Serial.println("Entering Timer State");
+    doublePressReceived = false;
 
     // Start time based on the elapsed time
     startTime = millis() - (elapsedTime * 1000);
@@ -30,11 +31,7 @@ void TimerState::enter()
     inputController.onDoublePressHandler([this]()
                                          {
                                              Serial.println("Timer State: Button Double Pressed");
-
-                                             // Send 'Stop' webhook (canceled)
-                                             networkController.sendWebhookAction("stop");
-                                             displayController.showCancel();
-                                             stateMachine.changeState(&StateMachine::idleState); // Transition to IdleState
+                                             doublePressReceived = true;  // Set flag and handle in update loop
                                          });
 
     networkController.startBluetooth();
@@ -45,6 +42,16 @@ void TimerState::update()
 {
     inputController.update();
     ledController.update();
+
+    // Handle double press in update loop
+    if (doublePressReceived) {
+        displayController.showCancel();
+        ledController.turnOff();
+        networkController.stopBluetooth();
+        networkController.sendWebhookAction("stop");
+        stateMachine.changeState(&StateMachine::idleState);
+        return;
+    }
 
     unsigned long currentTime = millis();
     elapsedTime = (currentTime - startTime) / 1000;
