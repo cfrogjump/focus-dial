@@ -11,10 +11,11 @@ public:
     void update() override;
     void exit() override;
 
-    void setTimer(int duration, unsigned long elapsedTime);
+    void setTimer(int duration, unsigned long elapsedTime = 0);
 
 private:
     int duration;
-    unsigned long startTime;
     unsigned long elapsedTime;
+    unsigned long startTime;
+    bool doublePressReceived;  // Flag to handle double press in update loop
 };
