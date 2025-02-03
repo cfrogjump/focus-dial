@@ -118,7 +118,7 @@ void LEDController::handleFillAndDecay()
         if (!decayStarted)
         {
             decayStarted = true;
-            pixelIndex = 1;
+            pixelIndex = 15;  // Start with LED #16 (index 15)
             brightnessLevel = brightness;
             lastUpdateTime = millis();
         }
@@ -138,13 +138,20 @@ void LEDController::handleFillAndDecay()
             {
                 leds.setPixelColor(pixelIndex, 0);
                 leds.show();
-                pixelIndex++;
+                
+                // Move to next LED
+                if (pixelIndex == 15) {
+                    pixelIndex = 0;  // After LED #16, go to LED #1
+                } else {
+                    pixelIndex++;  // Continue counter-clockwise
+                }
                 brightnessLevel = brightness;
-            }
 
-            if (pixelIndex > numLeds)
-            {
-                stopCurrentAnimation();
+                // If we've decayed the last LED (#15), stop the animation
+                if (pixelIndex == 15 && brightnessLevel == brightness) {
+                    turnOff();  // Turn off all LEDs
+                    stopCurrentAnimation();
+                }
             }
         }
     }
