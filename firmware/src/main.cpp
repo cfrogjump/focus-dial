@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include "Config.h"
 #include "StateMachine.h"
 #include "Controllers.h"
@@ -12,6 +13,9 @@ Preferences preferences;
 
 void setup() {
     Serial.begin(115200);
+    
+    // Initialize I2C
+    Wire.begin();
     
     // Initialize controllers
     inputController.begin();

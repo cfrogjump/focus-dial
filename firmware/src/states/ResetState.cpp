@@ -1,5 +1,6 @@
 #include "StateMachine.h"
 #include "Controllers.h"
+#include "Config.h"
 
 bool resetSelected = false; // button selection
 
@@ -12,11 +13,21 @@ void ResetState::enter()
     // Register state-specific handlers
     inputController.onEncoderRotateHandler([this](int delta)
                                            {
-        if (delta > 0) {
-            resetSelected = true;  // Select "RESET"
-        } else if (delta < 0) {
-            resetSelected = false;  // Select "CANCEL"
-        } });
+        Serial.print("Reset State: Encoder delta = ");
+        Serial.println(delta);
+        
+        // Update selection based on encoder value
+        // Note: When pins are swapped, clockwise = -1, counterclockwise = +1
+        if (delta != 0) {
+#if DEVICE_ORIENTATION == 1
+            resetSelected = (delta > 0);  // When rotated, counterclockwise (+1) selects RESET
+#else
+            resetSelected = (delta < 0);  // When normal, clockwise (-1) selects RESET
+#endif
+            Serial.print("Reset Selected = ");
+            Serial.println(resetSelected);
+        }
+    });
 
     inputController.onPressHandler([this]()
                                    {

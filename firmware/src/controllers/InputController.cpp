@@ -15,6 +15,8 @@ void InputController::handleButtonInterrupt()
 {
     if (instancePtr)
     {
+        bool buttonState = digitalRead(instancePtr->buttonPin);
+        Serial.printf("Button state: %d\n", buttonState);
         instancePtr->button.tick();
     }
 }
@@ -41,6 +43,7 @@ InputController::InputController(uint8_t buttonPin, uint8_t encoderPinA, uint8_t
 
 void InputController::begin()
 {
+    Serial.printf("Initializing button on pin %d\n", buttonPin);
     button.setDebounceMs(20);
     button.setClickMs(150);
     button.setPressMs(400);
@@ -50,9 +53,14 @@ void InputController::begin()
     pinMode(encoderPinA, INPUT_PULLUP);
     pinMode(encoderPinB, INPUT_PULLUP);
 
+    Serial.printf("Initial button state: %d\n", digitalRead(buttonPin));
+
     // Set up interrupts for encoder handling
     attachInterrupt(digitalPinToInterrupt(encoderPinA), handleEncoderInterrupt, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoderPinB), handleEncoderInterrupt, CHANGE);
+    
+    // Set up interrupt for button
+    attachInterrupt(digitalPinToInterrupt(buttonPin), handleButtonInterrupt, CHANGE);
 
     // Set up interrupt for button handling
     attachInterrupt(digitalPinToInterrupt(buttonPin), handleButtonInterrupt, CHANGE); // Interrupt on button state change
@@ -60,17 +68,16 @@ void InputController::begin()
 
 void InputController::update()
 {
+    // Check button state
     button.tick();
-    encoder.tick();
 
-    // Check encoder position and calculate delta
-    int currentPosition = encoder.getPosition();
-    int delta = currentPosition - lastPosition;
-
-    if (delta != 0)
+    // Check encoder position
+    long newPosition = encoder.getPosition();
+    if (newPosition != lastPosition)
     {
+        int delta = newPosition - lastPosition;
+        lastPosition = newPosition;
         onEncoderRotate(delta);
-        lastPosition = currentPosition;
     }
 }
 
@@ -110,6 +117,7 @@ void InputController::releaseHandlers()
 // Internal event handlers that call the registered state handlers
 void InputController::onButtonClick()
 {
+    Serial.println("Button clicked!");
     if (pressHandler != nullptr)
     {
         pressHandler();
@@ -118,6 +126,7 @@ void InputController::onButtonClick()
 
 void InputController::onButtonDoubleClick()
 {
+    Serial.println("Button double clicked!");
     if (doublePressHandler != nullptr)
     {
         doublePressHandler();
@@ -126,6 +135,7 @@ void InputController::onButtonDoubleClick()
 
 void InputController::onButtonLongPress()
 {
+    Serial.println("Button long pressed!");
     if (longPressHandler != nullptr)
     {
         longPressHandler();
